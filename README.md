@@ -67,3 +67,4 @@ python main.py 00388.HK     # specify a stock
 ## Architecture
 
 5 agents built with LangGraph StateGraph, each powered by a dedicated LLM prompt. Two VLM agents render charts via mplfinance + TA-Lib, then invoke qwen3-vl-plus for visual analysis. Trade execution wraps the HK AI MCP trading API with position sizing and risk limits (min 10 shares, max HK$500k per order).
+
