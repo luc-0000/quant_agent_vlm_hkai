@@ -7,19 +7,19 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from skills.hk_ai.trading_api import list_selectable_stocks, get_quote_by_symbols
 
 
-STOCK_SELECTOR_SYSTEM_PROMPT = """You are a Hong Kong stock selection analyst. Your task is to pick the ONE stock that shows the best short-term trading potential from a list of candidates.
+STOCK_SELECTOR_SYSTEM_PROMPT = """You are a Hong Kong stock selection analyst. Your task is to pick the TWO stocks that show the best short-term trading potential from a list of candidates.
 
 Analyze the provided market data and select based on:
 1. Momentum — recent price change %, volume activity
 2. Liquidity — sufficient trading volume for easy entry/exit
 3. Volatility — enough price movement to generate profit, but not extreme risk
 
-Return ONLY a JSON object (no markdown, no extra text):
-{"stock_code": "00700.HK", "stock_name": "Tencent", "reason": "one-line rationale in English"}
+Return ONLY a JSON array (no markdown, no extra text):
+[{"stock_code": "00700.HK", "stock_name": "Tencent", "reason": "one-line rationale"}, {"stock_code": "00388.HK", "stock_name": "HKEX", "reason": "one-line rationale"}]
 
 Rules:
-- Pick exactly ONE stock
-- The stock_code must be from the provided list
+- Pick exactly TWO different stocks
+- Each stock_code must be from the provided list
 - Prefer stocks with moderate positive momentum (not already overbought)
 - Avoid stocks with extreme gaps or abnormal volume spikes"""
 
@@ -28,7 +28,7 @@ class StockSelector:
     def __init__(self, llm):
         self.llm = llm
 
-    def pick_stock(self) -> dict:
+    def pick_stocks(self) -> list[dict]:
         stocks_result = list_selectable_stocks()
         if not stocks_result.get("success"):
             raise RuntimeError(f"Failed to list stocks: {stocks_result.get('error')}")
@@ -73,13 +73,13 @@ class StockSelector:
             lines.append(" | ".join(parts))
         return "\n".join(lines)
 
-    def _parse_response(self, raw: str) -> dict:
+    def _parse_response(self, raw: str) -> list[dict]:
         raw = raw.strip()
-        start = raw.find("{")
-        end = raw.rfind("}") + 1
+        start = raw.find("[")
+        end = raw.rfind("]") + 1
         if start != -1 and end > start:
             return json.loads(raw[start:end])
-        raise ValueError(f"Could not parse JSON from LLM response: {raw[:200]}")
+        raise ValueError(f"Could not parse JSON array from LLM response: {raw[:200]}")
 
 
 def _unwrap_data(data):

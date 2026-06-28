@@ -28,7 +28,7 @@ async def main(stock_code: str = None, **kwargs):
         stock_code: Optional HK stock code (e.g. '00700.HK'). If omitted, LLM picks one.
     """
     if stock_code:
-        print(f"Using provided stock: {stock_code}")
+        picks = [{"stock_code": stock_code, "stock_name": ""}]
     else:
         print("=== Step 1: LLM Stock Selection ===")
         selector_llm = ChatOpenAI(
@@ -39,18 +39,20 @@ async def main(stock_code: str = None, **kwargs):
             max_tokens=1024,
         )
         selector = StockSelector(selector_llm)
-        pick = selector.pick_stock()
-        stock_code = pick["stock_code"]
-        print(f"Selected: {pick['stock_code']} ({pick.get('stock_name', '')})")
-        print(f"Reason: {pick.get('reason', '')}")
+        picks = selector.pick_stocks()
+        for p in picks:
+            print(f"Selected: {p['stock_code']} ({p.get('stock_name', '')}) — {p.get('reason', '')}")
 
-    print(f"\n=== Step 2: Quant Agent Analysis for {stock_code} ===")
     from quant_agent_vlm.main import qa_main
-    action = await qa_main(stock_code)
-    print(f"Analysis decision: {action.value.upper()}")
 
-    print(f"\n=== Step 3: Trade Execution ===")
-    await _execute_trade(action, stock_code)
+    for pick in picks:
+        sc = pick["stock_code"]
+        print(f"\n=== Step 2: Quant Agent Analysis for {sc} ===")
+        action = await qa_main(sc)
+        print(f"Analysis decision: {action.value.upper()}")
+
+        print(f"\n=== Step 3: Trade Execution for {sc} ===")
+        await _execute_trade(action, sc)
 
 
 async def _execute_trade(action: Action, stock_code: str):
