@@ -1,0 +1,10 @@
+# Specific dependencies for quant_agent_vlm
+openai
+yfinance
+mplfinance
+
+# Database and AI (specific to this agent)
+chromadb==1.5.1
+pydantic==2.12.5
+tushare
+dashscope

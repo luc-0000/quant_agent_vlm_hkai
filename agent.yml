@@ -1,0 +1,16 @@
+import_path: trading_agents.quant_agent_vlm.main:qa_main
+required_args:
+  - stock_code
+
+# 报告输出目录（相对路径，相对于工作目录）
+# 云端工作目录: /app
+reports_dir: reports
+
+# 依赖文件路径（相对路径，相对于工作目录）
+# 用于 Docker 构建时安装该 agent 特有的依赖
+requirements_path: trading_agents/quant_agent_vlm/requirements.txt
+
+# default_args: {}
+# card:
+#   name: Equity Research Agent Gateway
+#   description: Single-agent gateway
