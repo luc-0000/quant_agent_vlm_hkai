@@ -20,18 +20,18 @@ class TradingGraph:
         # Initialize LLMs with config values
         self.agent_llm = ChatOpenAI(
             model=self.config.get("agent_llm_model", "gpt-4o-mini"),
-            api_key=self.config.get("api_key"),
-            base_url=self.config.get("base_url"),  # 新版本使用base_url而不是openai_api_base
-            temperature=self.config.get("temperature"),
-            max_tokens=self.config.get("max_token"),
+            api_key=self.config.get("agent_api_key"),
+            base_url=self.config.get("agent_base_url"),
+            temperature=self.config.get("agent_llm_temperature"),
+            max_tokens=self.config.get("agent_max_token"),
             streaming=False
         )
         self.graph_llm = ChatOpenAI(
             model=self.config.get("graph_llm_model", "gpt-4o-mini"),
-            api_key=self.config.get("api_key"),
-            base_url=self.config.get("base_url"),  # 新版本使用base_url而不是openai_api_base
-            temperature=self.config.get("temperature"),
-            max_tokens=self.config.get("max_token"),
+            api_key=self.config.get("graph_api_key"),
+            base_url=self.config.get("graph_base_url"),
+            temperature=self.config.get("graph_llm_temperature"),
+            max_tokens=self.config.get("graph_max_token"),
             streaming=False
         )
 
@@ -67,10 +67,14 @@ class TradingGraph:
         # Recreate LLM objects with current environment API key and config values
         self.agent_llm = ChatOpenAI(
             model=self.config.get("agent_llm_model", "gpt-4o-mini"),
+            api_key=self.config.get("agent_api_key"),
+            base_url=self.config.get("agent_base_url"),
             temperature=self.config.get("agent_llm_temperature", 0.1)
         )
         self.graph_llm = ChatOpenAI(
             model=self.config.get("graph_llm_model", "gpt-4o"),
+            api_key=self.config.get("graph_api_key"),
+            base_url=self.config.get("graph_base_url"),
             temperature=self.config.get("graph_llm_temperature", 0.1)
         )
         
