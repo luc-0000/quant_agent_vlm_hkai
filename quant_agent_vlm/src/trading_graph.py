@@ -4,8 +4,8 @@ Initializes LLMs and MCP tools for indicator, pattern, and trend analysis.
 Uses lazy loading to avoid deadlock when initializing MCP subprocess.
 """
 from langchain_openai import ChatOpenAI
-from trading_agents.quant_agent_vlm.default_config import DEFAULT_CONFIG
-from trading_agents.quant_agent_vlm.src.graph_setup import SetGraph
+from quant_agent_vlm.default_config import DEFAULT_CONFIG
+from quant_agent_vlm.src.graph_setup import SetGraph
 
 
 class TradingGraph:

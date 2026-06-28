@@ -9,7 +9,7 @@ if project_root not in sys.path:
 from mcp_servers.utils import get_mcp_studio_tools_async
 import matplotlib
 from fastmcp import FastMCP
-from trading_agents.quant_agent_vlm.src import color_style
+from quant_agent_vlm.src import color_style
 from mcp_servers.tech_mcp_servers.tech_tools_mcp_utils import split_line_into_segments, get_line_points, fit_trendlines_high_low, \
     fit_trendlines_single
 

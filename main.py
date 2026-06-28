@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langchain_openai import ChatOpenAI
-from trading_agents.quant_agent_vlm.default_config import DEFAULT_CONFIG
-from trading_agents.quant_agent_vlm.src.stock_selector import StockSelector
-from trading_agents.common.utils import Action
+from quant_agent_vlm.default_config import DEFAULT_CONFIG
+from quant_agent_vlm.src.stock_selector import StockSelector
+from common.utils import Action
 
 MIN_UNIT = 10
 MAX_ORDER_AMOUNT = 500_000
@@ -45,7 +45,7 @@ async def main(stock_code: str = None, **kwargs):
         print(f"Reason: {pick.get('reason', '')}")
 
     print(f"\n=== Step 2: Quant Agent Analysis for {stock_code} ===")
-    from trading_agents.quant_agent_vlm.main import qa_main
+    from quant_agent_vlm.main import qa_main
     action = await qa_main(stock_code)
     print(f"Analysis decision: {action.value.upper()}")
 

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Dict, Any
 
 from skills.hk_ai.trading_api import get_stock_kline
-from trading_agents.quant_agent_vlm.src.trading_graph import TradingGraph
+from quant_agent_vlm.src.trading_graph import TradingGraph
 
 
 class WebTradingAnalyzer:

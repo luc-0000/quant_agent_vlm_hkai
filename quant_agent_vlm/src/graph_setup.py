@@ -1,11 +1,11 @@
 from langgraph.graph import END, StateGraph, START
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import ToolNode
-from trading_agents.quant_agent_vlm.src.agent_state import IndicatorAgentState
-from trading_agents.quant_agent_vlm.src.decision_agent import create_final_trade_decider
-from trading_agents.quant_agent_vlm.src.indicator_agent import create_indicator_agent
-from trading_agents.quant_agent_vlm.src.pattern_agent import create_pattern_agent
-from trading_agents.quant_agent_vlm.src.trend_agent import create_trend_agent
+from quant_agent_vlm.src.agent_state import IndicatorAgentState
+from quant_agent_vlm.src.decision_agent import create_final_trade_decider
+from quant_agent_vlm.src.indicator_agent import create_indicator_agent
+from quant_agent_vlm.src.pattern_agent import create_pattern_agent
+from quant_agent_vlm.src.trend_agent import create_trend_agent
 
 
 class SetGraph:

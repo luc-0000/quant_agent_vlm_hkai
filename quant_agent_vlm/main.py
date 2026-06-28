@@ -2,15 +2,15 @@ import sys
 import shutil
 from pathlib import Path
 
-project_root = Path(__file__).resolve().parent.parent.parent
+project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from mcp_servers.tech_mcp_servers.tech_tools_mcp import get_tech_tools_mcp_async
 import asyncio
 from common.consts import Agents
-from trading_agents.common.utils import Action, output_results, PositionSignal
-from trading_agents.quant_agent_vlm.src.analyzer import WebTradingAnalyzer
+from common.utils import Action, output_results, PositionSignal
+from quant_agent_vlm.src.analyzer import WebTradingAnalyzer
 from dotenv import load_dotenv
 
 load_dotenv()
