@@ -36,7 +36,8 @@ async def main(stock_code: str = None, **kwargs):
             api_key=DEFAULT_CONFIG["api_key"],
             base_url=DEFAULT_CONFIG["base_url"],
             temperature=0.1,
-            max_tokens=1024,
+            max_tokens=DEFAULT_CONFIG.get("max_token", 4096),
+            max_retries=2,
         )
         selector = StockSelector(selector_llm)
         picks = selector.pick_stocks()
