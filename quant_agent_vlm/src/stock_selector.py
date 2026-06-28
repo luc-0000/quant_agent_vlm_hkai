@@ -75,6 +75,10 @@ class StockSelector:
 
     def _parse_response(self, raw: str) -> list[dict]:
         raw = raw.strip()
+        if raw.startswith("<think>"):
+            end_think = raw.find("</think>")
+            if end_think != -1:
+                raw = raw[end_think + len("</think>"):].strip()
         start = raw.find("[")
         end = raw.rfind("]") + 1
         if start != -1 and end > start:
