@@ -32,9 +32,9 @@ async def main(stock_code: str = None, **kwargs):
     else:
         print("=== Step 1: LLM Stock Selection ===")
         selector_llm = ChatOpenAI(
-            model=DEFAULT_CONFIG["agent_llm_model"],
-            api_key=DEFAULT_CONFIG["agent_api_key"],
-            base_url=DEFAULT_CONFIG["agent_base_url"],
+            model=DEFAULT_CONFIG["model"],
+            api_key=DEFAULT_CONFIG["api_key"],
+            base_url=DEFAULT_CONFIG["base_url"],
             temperature=0.1,
             max_tokens=1024,
         )

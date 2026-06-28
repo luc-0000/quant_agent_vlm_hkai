@@ -19,21 +19,21 @@ Same approach for K-line charts: VLM identifies 16 classic candlestick patterns 
 ## 5-Agent Pipeline
 
 ```
-Stock Screening                     qwen-plus
+Stock Screening                     VLM
   │  Scans all HK stocks, picks top 2
   ▼
-Technical Indicators                qwen-plus
+Technical Indicators                VLM
   │  TA-Lib: RSI / MACD / Stoch / ROC / Williams %R
   │  LLM interprets signals, divergences, crossovers
   ▼
 ┌──────────────┬──────────────┐
-│ Pattern      │ Trend        │     qwen3-vl-plus (VLM) × 2
+│ Pattern      │ Trend        │     VLM × 2
 │ K-line chart │ Trendline    │
 │ → VLM reads  │ → VLM reads  │
 │ 16 patterns  │ support/resist│
 └──────────────┴──────────────┘
   ▼
-Final Decision                      qwen-plus
+Final Decision                      VLM
   │  Synthesizes 3 reports → LONG / SHORT / HOLD
   │  + risk/reward ratio + forecast horizon + rationale
   ▼
@@ -49,6 +49,8 @@ Trade Execution
 
 ## Run
 
+**Requires a VLM (vision-capable) model.** All 5 agents — including the two that read candlestick charts — share the same model. On the fintools platform, select a VLM model (e.g., `qwen3-vl-plus`, `gpt-4o`).
+
 ```bash
 python main.py              # auto screen → analyze → trade
 python main.py 00388.HK     # specify a stock
@@ -59,7 +61,8 @@ python main.py 00388.HK     # specify a stock
 | Variable | Description |
 |----------|-------------|
 | `HKAI_MCP_TOKEN` | HK AI competition token |
-| `DASHSCOPE_API_KEY` | DashScope API key |
+| `DASHSCOPE_API_KEY` | DashScope API key (local dev) |
+| `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `LLM_MODEL` | Platform-injected (cloud) |
 
 ## Architecture
 
