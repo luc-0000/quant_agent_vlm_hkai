@@ -1,4 +1,5 @@
 import sys
+import shutil
 from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent.parent
@@ -33,8 +34,18 @@ async def qa_main(stock_code: str) -> Action:
         compatible_action = position_signal.to_action()
         if formatted_results.get('final_decision'):
             formatted_results['final_decision']['compatible_action'] = compatible_action.value
-        output_path = Path(__file__).resolve().parent / 'reports'
+
+        output_path = Path('log/reports')
         output_results(formatted_results, stock_code, output_path, Agents.quant_agent)
+
+        # Copy chart images into reports dir so pod's /api/reports/zip picks them up
+        data_dir = project_root / 'data'
+        for chart in ['kline_chart.png', 'trend_graph.png']:
+            src = data_dir / chart
+            if src.exists():
+                shutil.copy2(src, output_path / chart)
+                print(f'Copied {chart} to reports/')
+
         print(f'Position signal: {position_signal}')
         print(f'Execution action: {compatible_action}')
         return compatible_action

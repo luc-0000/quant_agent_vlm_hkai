@@ -1,6 +1,6 @@
-import sys
 import asyncio
 import math
+import sys
 from pathlib import Path
 
 project_root = Path(__file__).resolve().parent
@@ -15,13 +15,45 @@ from trading_agents.quant_agent_vlm.default_config import DEFAULT_CONFIG
 from trading_agents.quant_agent_vlm.src.stock_selector import StockSelector
 from trading_agents.common.utils import Action
 
-# HK AI trading rules
 MIN_UNIT = 10
 MAX_ORDER_AMOUNT = 500_000
 
 
-async def execute_trade(action: Action, stock_code: str):
-    """Execute buy/sell based on quant analysis decision."""
+async def main(stock_code: str = None, **kwargs):
+    """
+    Quant Agent HK AI — full pipeline entry point.
+    Called by the fintools agent framework (agent.yml → import_path: main:main).
+
+    Args:
+        stock_code: Optional HK stock code (e.g. '00700.HK'). If omitted, LLM picks one.
+    """
+    if stock_code:
+        print(f"Using provided stock: {stock_code}")
+    else:
+        print("=== Step 1: LLM Stock Selection ===")
+        selector_llm = ChatOpenAI(
+            model=DEFAULT_CONFIG["agent_llm_model"],
+            api_key=DEFAULT_CONFIG["api_key"],
+            base_url=DEFAULT_CONFIG["base_url"],
+            temperature=0.1,
+            max_tokens=1024,
+        )
+        selector = StockSelector(selector_llm)
+        pick = selector.pick_stock()
+        stock_code = pick["stock_code"]
+        print(f"Selected: {pick['stock_code']} ({pick.get('stock_name', '')})")
+        print(f"Reason: {pick.get('reason', '')}")
+
+    print(f"\n=== Step 2: Quant Agent Analysis for {stock_code} ===")
+    from trading_agents.quant_agent_vlm.main import qa_main
+    action = await qa_main(stock_code)
+    print(f"Analysis decision: {action.value.upper()}")
+
+    print(f"\n=== Step 3: Trade Execution ===")
+    await _execute_trade(action, stock_code)
+
+
+async def _execute_trade(action: Action, stock_code: str):
     from skills.hk_ai.trading_api import (
         get_account_snapshot, get_positions, get_quote_by_symbols,
         buy_stock, sell_stock,
@@ -59,7 +91,7 @@ async def execute_trade(action: Action, stock_code: str):
             return
 
         order_amount = quantity * price
-        print(f"[Execution] BUY {stock_code} × {quantity} shares ≈ HK$ {order_amount:,.2f}")
+        print(f"[Execution] BUY {stock_code} x {quantity} shares ≈ HK$ {order_amount:,.2f}")
         result = buy_stock(stock_code, quantity)
         _print_trade_result("BUY", result)
 
@@ -79,7 +111,7 @@ async def execute_trade(action: Action, stock_code: str):
             return
 
         quantity = (holding_qty // MIN_UNIT) * MIN_UNIT
-        print(f"[Execution] SELL {stock_code} × {quantity} shares")
+        print(f"[Execution] SELL {stock_code} x {quantity} shares")
         result = sell_stock(stock_code, quantity)
         _print_trade_result("SELL", result)
 
@@ -111,34 +143,6 @@ def _print_trade_result(side: str, result: dict):
         print(f"[Execution] {side} FAILED: {result.get('error')}")
 
 
-async def main():
-    stock_code = sys.argv[1] if len(sys.argv) > 1 else None
-
-    if stock_code:
-        print(f"Using provided stock: {stock_code}")
-    else:
-        print("=== Step 1: LLM Stock Selection ===")
-        selector_llm = ChatOpenAI(
-            model=DEFAULT_CONFIG["agent_llm_model"],
-            api_key=DEFAULT_CONFIG["api_key"],
-            base_url=DEFAULT_CONFIG["base_url"],
-            temperature=0.1,
-            max_tokens=1024,
-        )
-        selector = StockSelector(selector_llm)
-        pick = selector.pick_stock()
-        stock_code = pick["stock_code"]
-        print(f"Selected: {pick['stock_code']} ({pick.get('stock_name', '')})")
-        print(f"Reason: {pick.get('reason', '')}")
-
-    print(f"\n=== Step 2: Quant Agent Analysis for {stock_code} ===")
-    from trading_agents.quant_agent_vlm.main import qa_main
-    action = await qa_main(stock_code)
-    print(f"Analysis decision: {action.value.upper()}")
-
-    print(f"\n=== Step 3: Trade Execution ===")
-    await execute_trade(action, stock_code)
-
-
 if __name__ == '__main__':
-    asyncio.run(main())
+    stock = sys.argv[1] if len(sys.argv) > 1 else None
+    asyncio.run(main(stock_code=stock))
