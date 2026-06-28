@@ -74,16 +74,22 @@ class StockSelector:
         return "\n".join(lines)
 
     def _parse_response(self, raw: str) -> list[dict]:
-        raw = raw.strip()
-        if raw.startswith("<think>"):
-            end_think = raw.find("</think>")
+        original = raw.strip()
+        clean = original
+        if clean.startswith("<think>"):
+            end_think = clean.find("</think>")
             if end_think != -1:
-                raw = raw[end_think + len("</think>"):].strip()
-        start = raw.find("[")
-        end = raw.rfind("]") + 1
+                clean = clean[end_think + len("</think>"):].strip()
+        start = clean.find("[")
+        end = clean.rfind("]") + 1
         if start != -1 and end > start:
-            return json.loads(raw[start:end])
-        raise ValueError(f"Could not parse JSON array from LLM response: {raw[:200]}")
+            return json.loads(clean[start:end])
+        # Fallback: try original (JSON might be inside or before think block)
+        start = original.find("[")
+        end = original.rfind("]") + 1
+        if start != -1 and end > start:
+            return json.loads(original[start:end])
+        raise ValueError(f"No JSON array found. Stripped: {clean[:150]!r} | Original: {original[:150]!r}")
 
 
 def _unwrap_data(data):
